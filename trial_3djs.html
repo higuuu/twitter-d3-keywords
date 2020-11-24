@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <title>D3 Test</title>
+        <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+    </head>
+    <body>
+        <svg id="content" width="1200" height="600"></svg>
+        <script type="text/javascript">
+            // ここにD3スクリプトを書く
+            d3.select("body").append("p").text("twitter でコープさっぽろを含む投稿の重要語　Nov19~Nov24");
+
+            var width=1200, height=600;
+            var bubble = d3.pack()
+                .size([width, height])
+                .padding(1.5) ;
+
+            const root = 
+            {
+                "name": "twittter_api",
+                "data": "Thu Nov 19 15:44:59 +0000 2020",
+                "children": [
+                    {
+                    "name": "プさっぽろ",
+                    "val": 0.0008135952584875867
+                    },
+                    {
+                    "name": "coopsapporo",
+                    "val": 0.00801439749493353
+                    },
+                    {
+                    "name": "ぎっしり",
+                    "val": 0.02186758886044653
+                    },
+                    {
+                    "name": "box",
+                    "val": 0.022400688744934102
+                    },
+                    {
+                    "name": "北海道",
+                    "val": 0.02743262210380325
+                    },
+                    {
+                    "name": "ござい",
+                    "val": 0.029202227460018812
+                    },
+                    {
+                    "name": "キャンペ",
+                    "val": 0.029845123626413304
+                    },
+                    {
+                    "name": "ポテトチップス",
+                    "val": 0.030670677796500234
+                    },
+                    {
+                    "name": "ありがとう",
+                    "val": 0.03519248215918894
+                    },
+                    {
+                    "name": "トドック",
+                    "val": 0.04699391314659255
+                    },
+                    {
+                    "name": "小学校",
+                    "val": 0.05269608325462374
+                    },
+                    {
+                    "name": "プレゼント",
+                    "val": 0.05529599963208614
+                    },
+                    {
+                    "name": "なるほど",
+                    "val": 0.05839816606029376
+                    },
+                    {
+                    "name": "とっても",
+                    "val": 0.05910209520628063
+                    },
+                    {
+                    "name": "大好き",
+                    "val": 0.05910209520628063
+                    },
+                    {
+                    "name": "hbc",
+                    "val": 0.07185108889540255
+                    },
+                    {
+                    "name": "aws",
+                    "val": 0.07224144323077548
+                    },
+                    {
+                    "name": "tbs",
+                    "val": 0.07224144323077548
+                    },
+                    {
+                    "name": "time",
+                    "val": 0.07263157120973225
+                    },
+                    {
+                    "name": "twitter",
+                    "val": 0.07263157120973225
+                    }
+                ]
+                }
+
+            var nodes = d3.hierarchy( root )
+              .sum(function(d){ return d.val })
+            var bubble_data = bubble(nodes).descendants() ;
+
+            var no_root_bubble = bubble_data.filter( function(d){ return d.parent != null ;} ) ;
+
+            var max_val = d3.max(no_root_bubble, function(d){ return d.r ;});     
+            var min_val = d3.min(no_root_bubble, function(d){return d.r ; });
+
+            var color_scale = d3.scaleLinear()
+                    .domain( [min_val, max_val] )
+                .range(d3.schemeCategory10 );
+            var font_scale = d3.scaleLinear()
+                    .domain([min_val, max_val])
+                .range([9, 28]);
+                
+            var bubbles = d3.select("#content")
+                .selectAll(".bubble")
+                .data(no_root_bubble)
+                .enter()
+                .append("g")
+                .attr("class", "bubble")
+                .attr("transform", function(d){ return "translate("+d.x+","+d.y+")" ;})
+                ;
+
+            bubbles.append("circle")
+                .attr("r", function(d){ return d.r })
+                .style("fill", function(d,i){ 
+                            return color_scale(d.r); 
+                });                  
+                ; 
+            bubbles.append("text")
+                    .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "central")
+                .text(function(d){ return d.data.name ; })
+                .style("font-size", function(d){ return font_scale(d.r) ; })
+                ;
+        </script>
+    </body>
+</html>
